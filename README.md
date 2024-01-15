@@ -54,6 +54,12 @@
   - for form
   - name is how .get() finds your item
 
+## Typescript
+
+- if it is out of sync try
+  - > Svelte: Restart Language Server
+  - > Developer: Reload Window
+
 ## SvelteKit
 
 - +page.svelte
@@ -74,7 +80,18 @@
 - can create app.css in /routes folder for global styles
 - layouts are layered from the base model
 - kitEndpoint
-  - shortcut to generate GET request for /api in Svelte
+  - shortcut to generate GET request for /api in Svelte (+server.ts)
+- kitLoad
+  - shortcut for +(page/layout).ts or +(page/layout).server.ts
+- SHOULD ALWAYS BE './$types' !!
+
+## Urls
+
+- can pass /posts/{slug} directly in string without ``
+
+## meta data
+
+- can you {page} from '$app/stores' to get global data and set it via <svelte:head>
 
 ## Api
 
@@ -93,6 +110,44 @@ Json
   };
 - event.setHeaders({ 'Cache-Control': 'max-age=60' });
   - caches response -> Don't have to do in production, Vercel takes care of this for you
+  - go to network tab and check the "Disable Cache" button to have it fetch a different number of posts each time you refresh
+
+## How to use SSR
+
+- +pages.svelte uses CSR
+- +server.ts is for backend route
+- +page.ts is for SSR
+  - update page with content for page and nothing else using PageLoad
+  - utilizes its own fetch api
+- Could do const {posts} = data but this isn't reactive if something changes with the data
+  - Better to do this $: ({ posts } = data);
+
+## Page.ts
+
+- can extract {fetch} or {params}
+- use PageLoad type
+- does not work with Prisma values because it tries to grab this from the browser
+
+## Page.server.ts
+
+- Good for accessing db values
+- PageServerLoad type
+- only runs on the server, accessing secret values
+  - use +page.ts for everything else
+
+## Layout Page.ts and Page.server.ts
+
+- Can use these for layouts as well
+- combines it with other server side rendered aspects of any of the child components
+- LayoutData in .svelte and LayoutServerLoad in .server.ts
+
+## Datetime
+
+- use Intl.DateTimeFormat().format(date) for useful formatting options
+
+## Errors
+
+- import {error} from @sveltejs/kit
 
 ## Routes
 
@@ -104,6 +159,16 @@ Json
   - /params/slug.ts
   - then add [slug=slug] if the second "slug" is the name of the .ts file
   - now 404 error will be thrown if you insert a space, for example, in the url
+
+## API Creation
+
+- in server.ts
+- {params, url, route} are available
+- in api/posts
+  - using ?limit=4&order=desc as params
+  - gives us as searchParams:
+    - URLSearchParams { 'limit' => '4', 'order' => 'desc' },
+- can use '??' as an "||" alternative
 
 ## $app/stores
 
