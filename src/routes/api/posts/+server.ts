@@ -15,10 +15,15 @@ export const GET: RequestHandler = async ({ url }) => {
 	// 	{ 'Cache-Control': 'public, max-age=0, s-maxage=60' } // Good for SSR
 	// );
 
-	const limit = url.searchParams.get('limit') ?? 30;
+	const limit = Number(url.searchParams.get('limit') ?? 30);
 	const order = url.searchParams.get('order') ?? 'asc';
 
-	const post = await db.post.findMany({});
+	console.log(limit, order);
+
+	const post = await db.post.findMany({
+		orderBy: { id: order },
+		take: limit
+	});
 
 	return json(post);
 };

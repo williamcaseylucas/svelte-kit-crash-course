@@ -32,4 +32,12 @@
 		gap: 4rem;
 		margin-top: 2rem;
 	}
+
+	:global(body) {
+		padding: 2rem;
+	}
+
+	:global(input, button) {
+		border-radius: 1rem;
+	}
 </style>

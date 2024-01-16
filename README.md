@@ -27,6 +27,26 @@
 - pnpx prisma migrate reset
   - removes local db
 
+#### Zod
+
+- pnpm i zod zod-form-data
+- use safeParse, Object.fromEntries, and error.flatten().fieldErrors
+- Example in /routes/login
+
+## Notes
+
+- Skipped advanced layouts
+
+## Hooks
+
+- resolve(event) is normal behavior
+- can check pathname
+- can check if user is logged in
+- authentication
+  - Will have you create +layout.server.ts which returns user: locals.user as object to see if user is logged in
+  - This is because it becomes available in $page store
+- can access this information on client via $app/stores "page"
+
 ## create custom snippet
 
 - ctrl + shift + p
@@ -169,6 +189,101 @@ Json
   - gives us as searchParams:
     - URLSearchParams { 'limit' => '4', 'order' => 'desc' },
 - can use '??' as an "||" alternative
+
+## Working with forms
+
+- Create /lib/server/database.ts which has array of values
+
+## Add global styles to root layout
+
+- :global(\*\*any_number_of_vals){css}
+
+## How to create Svelte kit api route with extension
+
+- right click on folder and click svelte file
+- can add page.svelte, page.server.ts, and server.ts for route
+- use space to select files
+
+## Forms (standard)
+
+- action -> Means the route we want this to be handled in
+- GET request
+  - adds info to url with : "action?(name for first input)&(name for second input)
+  - insecure since it adds password to url
+- POST request
+  - use server side to add data
+  - action still is appended to url
+- can create hidden input field with id that can be sent to the server
+- in server.ts, can pull out request and grab formdata from that
+- whatever button "name" you gave to the hidden button, that is the value you can pass into formData.get('')
+- Can return responses as so
+  - return json(data, { status: 400 });
+  - json({success: true})
+- example in /routes/todos
+
+## Forms (SvelteKit form actions)
+
+- Don't need server.ts where everything is configured on server
+- only need page.server.ts and page.svelte
+- create actions: Actions where you predefine methods that you want to do stuff
+- error validation
+  - if (!todo) {
+    return fail(400, { todo, missing: true });
+    }
+- export let form: ActionData to grabt info from backend
+- <form method="POST" action="?/removeTodo"> -> Tells Sveltekit to execute this query param
+- <button formaction="?/clearTodos" class="secondary" type="submit">Clear</button>
+  - Overrides Parent form action and calls this method instead
+- just ? puts the function in, "/" calls it
+- works before js which makes your app more resilient
+
+## use:enhance -> For forms
+
+- can just call use:enhance for basic functionality
+- use:enhance={addTodo}
+
+  - const addTodo: SubmitFunction = (input) => {
+    // do something before the form submits
+
+        return async (options) => {
+        	// do something after the form submits
+          <!-- can use update() function here -->
+        };
+
+    };
+
+- <button type="submit" aria-busy={loading} class:secondary={loading}>+ Add Todo</button>
+
+  - Can add aria-busy to a boolean value
+  - can create conditional class rendering if loading is true
+
+- Invalidates queries and handles updating all form related info with js
+- Way to supercharge forms
+
+## Login form validation with Zod
+
+- login callback can be used with use:enhance={login} on form
+- use applyAction(result)
+- applyAction and update are similar
+
+## Svelte invalidate query from server side (Tanstack query is for frontend)
+
+- Good for reloading data, use afterNavigate to reload components themselves
+- on server
+  - use "depends("SOME_APP:SOME_VALUE")" on the server
+- on client
+
+  - // a)
+    invalidate('app:posts');
+
+  - // b) only works with unique url
+    invalidate('api/posts');
+
+  - // c)
+    invalidate((url) => url.href.includes('posts'));
+
+  - // d) Nuclear option
+    invalidateAll();
 
 ## $app/stores
 

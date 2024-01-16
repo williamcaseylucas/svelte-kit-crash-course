@@ -1,9 +1,22 @@
 <script lang="ts">
+	import { invalidate, invalidateAll } from '$app/navigation';
 	import type { PageData } from './$types';
+	import { page } from '$app/stores';
 
 	export let data: PageData;
 	// const { posts } = data;
 	$: ({ posts } = data);
+
+	function rerunLoadFunction() {
+		// a)
+		invalidate('app:posts');
+		// // b)
+		// invalidate('api/posts');
+		// // c)
+		// invalidate((url) => url.href.includes('posts'));
+		// // d) Nuclear option
+		// invalidateAll();
+	}
 
 	// ---- simulating CSR interaction ----
 	// import type { Post } from '@prisma/client';
@@ -27,7 +40,12 @@
 	// }
 </script>
 
+{#if $page.data.user}
+	Welcome {$page.data.user}
+{/if}
+
 <h1>Posts</h1>
+<button on:click={rerunLoadFunction}>Rerun</button>
 <p>Showing {posts.length} posts.</p>
 {#each posts as { slug, title }}
 	<ul>
@@ -36,6 +54,14 @@
 		</li>
 	</ul>
 {/each}
+
+<!-- Forms -->
+<h1>Forms</h1>
+<form action="/login" method="POST">
+	<input type="text" name="user" />
+	<input type="password" name="password" />
+	<button type="submit">Login</button>
+</form>
 
 <!-- For debugging -->
 <!-- <pre>
